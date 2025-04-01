@@ -16,7 +16,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    command: >
+    command: 
       sh -c "npm install && node src/index.js"
     ports:
       - "3000:3000"
