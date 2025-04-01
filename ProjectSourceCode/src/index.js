@@ -4,6 +4,12 @@ const bcrypt = require("bcryptjs");
 const path = require("path");
 const { Pool } = require("pg");
 
+const hbs = handlebars.create({
+  extname: 'hbs',
+  layoutsDir: __dirname + '/views/layouts',
+  partialsDir: __dirname + '/views/partials',
+});
+
 const app = express();
 const hbs = require("hbs");
 hbs.registerPartials(path.join(__dirname, "views/partials"));
@@ -23,6 +29,8 @@ app.use(session({
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+
+
 
 // DB connection
 const db = new Pool({
@@ -97,9 +105,19 @@ app.get("/", (req, res) => {
       res.redirect("/login");
     });
   });
+
+  // -------------------------------------  ROUTES for logout.hbs   ----------------------------------------------
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(function(err) {
+    res.render('pages/logout');
+  });
+});
   
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+
