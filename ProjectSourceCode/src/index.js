@@ -59,32 +59,48 @@ app.get("/login", (req, res) => {
   app.get("/register", (req, res) => {
     res.render("pages/register");
   });
+
   // Show home page (only if logged in)
-app.get("/", (req, res) => {
+  app.get("/", async (req, res) => {
     if (!req.session.userId) {
       return res.redirect("/login");
     }
-    res.render("pages/home", { userId: req.session.userId });
+  
+    try {
+      const result = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
+      const user = result.rows[0];
+  
+      res.render("pages/home", {
+        first_name: user.first_name
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Failed to load home page.");
+    }
   });
   
   // Handle registration
+  
   app.post("/register", async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).send("Missing credentials");
+    const { first_name, email, password } = req.body;
+    if (!first_name || !email || !password) {
+      return res.status(400).send("Missing registration fields");
+    }
   
     const hashedPassword = await bcrypt.hash(password, 10);
   
     try {
       const result = await db.query(
-        "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id",
-        [email, hashedPassword]
+        "INSERT INTO users (first_name, email, password) VALUES ($1, $2, $3) RETURNING id",
+        [first_name, email, hashedPassword]
       );
+  
       req.session.userId = result.rows[0].id;
       res.redirect("/");
     } catch (err) {
-      console.error(err);
-      res.status(500).send("User registration failed.");
-    }
+        console.error("❌ Registration error:", err); // <-- more helpful
+        res.status(500).send("Registration failed.");
+      }
   });
   
   // Handle login
@@ -121,6 +137,34 @@ app.get('/logout', (req, res) => {
     res.render('pages/logout');
   });
 });
+app.get("/", async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect("/login");
+  }
+
+  try {
+    const result = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
+    const user = result.rows[0];
+
+    res.render("pages/home", {
+      first_name: user.first_name
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to load home page.");
+  }
+});
+app.get('/profile', (req, res) => {
+    res.render('pages/profile', { userId: req.session.userId });
+  });
+  
+  app.get('/pin/new', (req, res) => {
+    res.render('pages/newPin');
+  });
+  
+  app.get('/friends/add', (req, res) => {
+    res.render('pages/addFriend');
+  });
   
 // Start server
 const PORT = process.env.PORT || 3000;
