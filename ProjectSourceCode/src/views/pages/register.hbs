@@ -1,25 +1,32 @@
-{{> header}}
-<div class="container d-flex flex-column align-items-center mt-6">
-<div class="row justify-content-center">
-<h2 class="text-center"> Register: </h2>
+<div class="container d-flex flex-column align-items-center justify-content-center mt-5">
+  <div class="row w-100 justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <h2 class="text-center mb-4">Register</h2>
 
-    <form action="/register" method="POST">
-        <div class="mb-2">
-            <label for="email" class="form-label"> Email: </label>
-            <input type = "email" name = "email" id=  "email" class = "form-control" required />
+      {{#if error}}
+        <div class="alert alert-danger text-center" role="alert">
+          {{error}}
+        </div>
+      {{/if}}
+
+      <form action="/register" method="POST" class="shadow p-4 rounded bg-white">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" id="email" class="form-control" required autofocus />
         </div>
 
-        <div class="mb-2">
-            <label for = "password" class = "form-label"> Password: </label>
-            <input type = "password" name = "password" id = "password" class= "form-control" required />
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" name="password" id="password" class="form-control" required />
         </div>
 
-        <button type="submit" class="btn btn-primary w-35"> Register </button>
-    </form>
+        <button type="submit" class="btn btn-success w-100">Register</button>
+      </form>
 
-   <p class="text-center mt-2">
-        Already have an account? <a href="/login">Login</a>
-    </p>
+      <p class="text-center mt-3">
+        Already have an account? <a href="/login">Login here</a>
+      </p>
+    </div>
   </div>
 </div>
-{{> footer}}    
+

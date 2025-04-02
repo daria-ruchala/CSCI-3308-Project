@@ -3,16 +3,25 @@ const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const path = require("path");
 const { Pool } = require("pg");
-
-const hbs = handlebars.create({
-  extname: 'hbs',
-  layoutsDir: __dirname + '/views/layouts',
-  partialsDir: __dirname + '/views/partials',
-});
-
+const exphbs = require("express-handlebars");
 const app = express();
-const hbs = require("hbs");
-hbs.registerPartials(path.join(__dirname, "views/partials"));
+// const hbs = handlebars.create({
+//   extname: 'hbs',
+//   layoutsDir: __dirname + '/views/layouts',
+//   partialsDir: __dirname + '/views/partials',
+// });
+app.engine("hbs", exphbs.engine({
+    extname: "hbs",
+    defaultLayout: "main",
+    layoutsDir: path.join(__dirname, "views/layouts"),
+    partialsDir: path.join(__dirname, "views/partials")
+  }));
+  
+  app.set("view engine", "hbs");
+  app.set("views", path.join(__dirname, "views"));
+
+
+//hbs.registerPartials(path.join(__dirname, "views/partials"));
 
 // Parse body
 app.use(express.urlencoded({ extended: true }));
@@ -40,8 +49,7 @@ const db = new Pool({
   database: process.env.DB_DATABASE || "jobtracker",
   port: process.env.DB_PORT || 5432,
 });
-
-// 🔽 Your routes (register/login/logout) go here 🔽
+//Your routes (register/login/logout) go here 
 // Show login page
 app.get("/login", (req, res) => {
     res.render("pages/login");
