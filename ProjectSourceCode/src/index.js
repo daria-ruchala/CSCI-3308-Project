@@ -38,6 +38,9 @@ app.use(session({
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/static', express.static(path.join(__dirname, 'recources')));
+
+
 
 
 
@@ -154,9 +157,36 @@ app.get("/", async (req, res) => {
     res.status(500).send("Failed to load home page.");
   }
 });
-app.get('/profile', (req, res) => {
-    res.render('pages/profile', { userId: req.session.userId });
-  });
+  
+  // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
+  app.get('/profile', async (req, res) => {
+    if (!req.session.userId) {
+      return res.redirect("/login");
+  }
+
+  try {
+    const result = await db.query("SELECT first_name, email FROM users WHERE id = $1", [req.session.userId]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    res.render("pages/profile", {
+      first_name: user.first_name,
+      email: user.email
+    });
+  } catch (err) {
+    console.error(" Profile route error:", err);
+    res.status(500).send("Failed to load profile page.");
+  }
+});
+
+
+
+
+
+
   
   app.get('/pin/new', (req, res) => {
     res.render('pages/newPin');
