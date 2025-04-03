@@ -1,0 +1,47 @@
+{{!-- need to change the email tag to something else most likely,
+just something to be able to twll if the user is logged on to show 
+more relavent content in the nav bar. Also need to discuss how the
+nav bar should be organize with the team. Need to find the names of the pages as well --}}
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+      <a class="navbar-brand" href="/"></a>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          {{#if email}}
+          <span class="navbar-text">Welcome, {{name}}!</span>
+          {{else}}
+          <span class="navbar-text">Welcome</span>
+          {{/if}}
+        </li>
+        <li class="nav-item">
+          {{#if email}}
+          {{else}}
+          <a class="nav-link" href="/login">Login</a>
+          {{/if}}
+          </li>
+        {{#if email}}
+        <li class="nav-item">
+          <a class="nav-link" href="/home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Log Out</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/friends">Friends</a>
+        </li>
+        {{/if}}
+      </ul>
+    </div>
+
+    <div class="navbar-collapse collapse order-3 dual-collapse2">
+      <ul class="navbar-nav ml-auto">
+          {{#if email}}
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Profile</a>
+          </li>
+          {{/if}}
+      </ul>
+    </div>
+  </nav>
+</header>
