@@ -1,3 +1,38 @@
+<div id="map"></div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoiZm90b3M0ZmFtaWx5IiwiYSI6ImNtOGh6eWx1cDA1eXMybHB1Z2kyajJqbG0ifQ.9paU93BLc6W7vG-8KuOxng';
+
+  // creates map background
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-96, 37.8],
+    zoom: 2,
+  });
+
+  // creates new pins when clicking on the map
+  map.on('click', function (e) {
+    // ensures user is trying to click popup instead of adding new pin
+    if (e.originalEvent.target.closest('.mapboxgl-marker') ||
+      e.originalEvent.target.closest('.mapboxgl-popup')) {
+      return;
+    }
+
+    const coords = e.lngLat;
+    const el = document.createElement('div');
+    el.className = 'marker';
+
+    const popup = new mapboxgl.Popup({ offset: 25 })
+      .setHTML(`<h6>New Pin</h6><p>Lat: ${coords.lat.toFixed(4)}, Lng: ${coords.lng.toFixed(4)}</p>`);
+
+    new mapboxgl.Marker(el)
+      .setLngLat([coords.lng, coords.lat])
+      .setPopup(popup)
+      .addTo(map);
+  });
+</script>
+
 <div class="pos-f-t">
   <div class="collapse" id="navbarToggleExternalContent">
     <div class="bg-dark p-4 rounded text-white">
@@ -30,15 +65,9 @@
 
   <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarToggleExternalContent"
-        aria-controls="navbarToggleExternalContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false"
+        aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
     </div>
