@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friend List</title>
+          <style>
+        input {
+            display: none;
+        }
+        #submit-button {
+            display: none;
+        }
+    </style>  
+</head>
+<body>
+
+    <h1>Friend List</h1>
+    <ul id="friend-list">
+    </ul>
+    
+    <button onclick="showInput()">Add a Friend</button>
+    
+    <div id="input-section">
+        <input type="text" id="friend-username" placeholder="Enter friend's username">
+        <button id="submit-button" onclick="addFriend()">Submit</button>
+    </div>
+
+    <script>
+        function showInput() {
+            document.getElementById("friend-username").style.display = "inline-block";
+            document.getElementById("submit-button").style.display = "inline-block";
+        }
+
+        function addFriend() {
+            const username = document.getElementById("friend-username").value;
+            if (username) {
+                const friendList = document.getElementById("friend-list");
+                const newFriend = document.createElement("li");
+                newFriend.textContent = username;
+                friendList.appendChild(newFriend);
+
+                document.getElementById("friend-username").value = '';
+                document.getElementById("friend-username").style.display = "none";
+                document.getElementById("submit-button").style.display = "none";
+            } else {
+                alert("Please enter a valid username.");
+            }
+        }
+    </script>
+
+</body>
+        <div class="mt-4 text-center">
+          <a href="/" class="btn btn-primary">Back to Home</a>
+        </div>
+</html>
