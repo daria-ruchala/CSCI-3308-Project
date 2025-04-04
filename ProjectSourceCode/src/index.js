@@ -183,10 +183,6 @@ app.get("/", async (req, res) => {
 });
 
 
-
-
-
-
   
   app.get('/pin/new', (req, res) => {
     res.render('pages/newPin');
@@ -196,10 +192,10 @@ app.get("/", async (req, res) => {
     res.render('pages/addFriend');
   });
   
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+  module.exports = app.listen(3000);
+
+
+
 
 
