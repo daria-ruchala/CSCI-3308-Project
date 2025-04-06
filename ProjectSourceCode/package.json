@@ -9,5 +9,10 @@
     "hbs": "^4.2.0",
     "pg": "^8.14.1",
     "tailwindcss": "^4.0.17"
+  },
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "chai-http": "^5.1.1",
+    "mocha": "^10.8.2"
   }
 }

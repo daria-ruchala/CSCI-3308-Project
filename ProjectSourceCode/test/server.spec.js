@@ -1,17 +1,14 @@
 // ********************** Initialize server **********************************
-
 const server = require('../src/index');
 
 // ********************** Import Libraries ***********************************
-
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-chai.should();
 chai.use(chaiHttp);
-const { assert, expect } = chai;
+chai.should();
+const { expect, assert } = chai;
 
 // ********************** DEFAULT WELCOME TESTCASE ****************************
-
 describe('Server!', () => {
   it('Returns the default welcome message', done => {
     chai
@@ -19,25 +16,23 @@ describe('Server!', () => {
       .get('/welcome')
       .end((err, res) => {
         expect(res).to.have.status(200);
-        expect(res.body.status).to.equals('success');
-        assert.strictEqual(res.body.message, 'Welcome!');
+        expect(res.body.status).to.equal('success');
+        expect(res.body.message).to.equal('Welcome!');
         done();
       });
   });
 });
 
-// ***********************  UNIT TEST CASES FOR /register **************************
-
+// *********************** UNIT TEST CASES FOR /register **************************
 describe('Testing /register API', () => {
-  // ✅ Positive test case
-  it('Positive: should register user with valid input', done => {
+  it('✅ Positive: should register user with valid input', done => {
     chai
       .request(server)
       .post('/register')
-      .type('form') // because you are using express.urlencoded
+      .type('form') // Because express uses urlencoded
       .send({
         first_name: 'TestUser',
-        email: 'testuser' + Math.floor(Math.random() * 10000) + '@example.com', // make unique
+        email: `testuser${Math.floor(Math.random() * 10000)}@example.com`,
         password: 'securepassword'
       })
       .end((err, res) => {
@@ -46,8 +41,7 @@ describe('Testing /register API', () => {
       });
   });
 
-  // ❌ Negative test case
-  it('Negative: should return 400 for missing fields', done => {
+  it('❌ Negative: should return 400 for missing fields', done => {
     chai
       .request(server)
       .post('/register')
@@ -66,31 +60,29 @@ describe('Testing /register API', () => {
 });
 
 // *********************** REDIRECT TEST **************************
-
 describe('Redirect testing', () => {
-    it('/test route should redirect to /login with 302 HTTP status code', done => {
-      chai
-        .request(server)
-        .get('/test')
-        .end((err, res) => {
-          res.should.have.status(302); // 302 Redirect
-          res.should.redirectTo(/\/login$/); // redirect to /login (works with localhost too)
-          done();
-        });
-    });
+  it('GET /test should redirect to /login with 302', done => {
+    chai
+      .request(server)
+      .get('/test')
+      .end((err, res) => {
+        res.should.have.status(302);
+        res.should.redirectTo(/\/login$/); // Regex for /login
+        done();
+      });
   });
-  
-  // ***********************  RENDER TEST **************************
-  
-  describe('Render testing', () => {
-    it('"/login" route should render with an HTML response', done => {
-      chai
-        .request(server)
-        .get('/login')
-        .end((err, res) => {
-          res.should.have.status(200); // Success
-          res.should.be.html;         // Rendered HTML
-          done();
-        });
-    });
+});
+
+// *********************** RENDER TEST **************************
+describe('Render testing', () => {
+  it('GET /login should return HTML', done => {
+    chai
+      .request(server)
+      .get('/login')
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.should.be.html;
+        done();
+      });
   });
+});
