@@ -193,7 +193,7 @@ app.get("/", async (req, res) => {
   });
   
   app.get('/friends/add', (req, res) => {
-    res.render('pages/addFriend');
+    res.render('pages/friends');
   });
   
 // Start server
