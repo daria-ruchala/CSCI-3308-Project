@@ -101,7 +101,7 @@ app.get("/login", (req, res) => {
       req.session.userId = result.rows[0].id;
       res.redirect("/");
     } catch (err) {
-        console.error("❌ Registration error:", err); // <-- more helpful
+        console.error("Registration error:", err); // <-- more helpful
         res.status(500).send("Registration failed.");
       }
   });
