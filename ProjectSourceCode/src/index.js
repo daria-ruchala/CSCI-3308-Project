@@ -113,12 +113,19 @@ app.get("/login", (req, res) => {
     try {
       const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
       const user = result.rows[0];
-      if (!user) return res.status(400).send("Invalid credentials");
+  
+      if (!user) {
+        return res.render("pages/login", { error: "No account found with that email." });
+      }
   
       const match = await bcrypt.compare(password, user.password);
-      if (!match) return res.status(400).send("Invalid credentials");
+      if (!match) {
+        return res.render("pages/login", { error: "Incorrect password." });
+      }
   
       req.session.userId = user.id;
+      req.session.email = user.email;
+      req.session.first_name = user.first_name;
       res.redirect("/");
     } catch (err) {
       console.error(err);

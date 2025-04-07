@@ -11,6 +11,12 @@
   <div class="auth-container">
     <h2 class="text-center">Login</h2>
 
+    {{#if error}}
+      <div class="alert alert-danger text-center" role="alert">
+        {{error}}
+      </div>
+    {{/if}}
+
     <form action="/login" method="POST">
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
@@ -29,5 +35,12 @@
       Don’t have an account? <a href="/register">Register here</a>
     </p>
   </div>
+
+  <script>
+    setTimeout(() => {
+      const alert = document.querySelector(".alert");
+      if (alert) alert.style.display = "none";
+    }, 4000);
+  </script>
 </body>
 </html>
