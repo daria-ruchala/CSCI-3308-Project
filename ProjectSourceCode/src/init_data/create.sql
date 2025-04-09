@@ -50,3 +50,4 @@ CREATE TABLE users_to_photos (
     user_id INT NOT NULL,
     photo_id INT NOT NULL
 );
+

@@ -202,12 +202,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-
-
-
-
-
-  
   app.get('/pin/new', (req, res) => {
     res.render('pages/newPin');
   });
