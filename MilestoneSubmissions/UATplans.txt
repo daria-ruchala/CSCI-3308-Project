@@ -6,7 +6,6 @@ Testers: Group members simulating end-users
 
 
 Feature 1: User Login
----------------------
 Test Cases:
 1. Successful login with valid credentials
    - Input: Registered email and correct password
@@ -37,7 +36,6 @@ Observed Results:
 
 
 Feature 2: User Registration
-----------------------------
 Test Cases:
 1. Successful registration with valid fields
    - Input: Valid name, email, password
@@ -53,9 +51,9 @@ Test Cases:
 
 Test Data:
 {
-  "first_name": "Test",
-  "email": "testuser@example.com",
-  "password": "StrongPass123"
+  "first_name": "emiliano",
+  "email": "medinagzz03@gmail.com,
+  "password": "emi"
 }
 
 Environment:
@@ -69,7 +67,6 @@ Observed Results:
 
 
 Feature 3: User Profile Page
-----------------------------
 Test Cases:
 1. Access profile when logged in
    - Input: Click "Profile" in nav after login
