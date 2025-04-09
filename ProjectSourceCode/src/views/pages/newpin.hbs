@@ -1,3 +1,51 @@
+<h2 class="text-xl font-bold mb-4">Add a New Pin</h2>
 
-<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
-<input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file">
+<form id="pinForm">
+  <label for="image">Choose an image:</label>
+  <input type="file" id="imageInput" accept="image/*" required class="block mb-4"/>
+
+  <label for="comment">Add a comment:</label>
+  <input type="text" id="commentInput" placeholder="Your comment..." class="block mb-4"/>
+
+  <button type="submit" class="bg-blue-500 text-black px-4 py-2 rounded">Add Pin</button>
+</form>
+
+<div id="preview" class="mt-6"></div>
+<script>
+  const form = document.getElementById("pinForm");
+  const imageInput = document.getElementById("imageInput");
+  const commentInput = document.getElementById("commentInput");
+  const preview = document.getElementById("preview");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const file = imageInput.files[0];
+    const comment = commentInput.value;
+
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const imgElement = document.createElement("img");
+      imgElement.src = event.target.result;
+      imgElement.alt = "Preview";
+      imgElement.classList.add("max-w-xs", "max-h-48", "rounded", "shadow-md", "object-cover");
+
+      const commentElement = document.createElement("p");
+      commentElement.textContent = comment;
+      commentElement.classList.add("mt-2", "text-gray-700");
+
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("mb-8");
+      wrapper.appendChild(imgElement);
+      wrapper.appendChild(commentElement);
+
+      preview.appendChild(wrapper);
+
+      form.reset();
+    };
+
+    reader.readAsDataURL(file);
+  });
+</script>

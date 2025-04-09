@@ -5,6 +5,7 @@ const path = require("path");
 const { Pool } = require("pg");
 const exphbs = require("express-handlebars");
 const app = express();
+const multer = require("multer");
 // const hbs = handlebars.create({
 //   extname: 'hbs',
 //   layoutsDir: __dirname + '/views/layouts',
@@ -20,7 +21,16 @@ app.engine("hbs", exphbs.engine({
   app.set("view engine", "hbs");
   app.set("views", path.join(__dirname, "views"));
 
-
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, "public/uploads"));
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname)); // unique name
+    }
+  });
+  const upload = multer({ storage });
+  
 //hbs.registerPartials(path.join(__dirname, "views/partials"));
 
 // Parse body
@@ -183,9 +193,22 @@ app.get("/", async (req, res) => {
 });
 
 
+const uploadedData = [];
 
+// Routes
+// New pin page with image form
+app.get("/pin/new", (req, res) => {
+  res.render("pages/newPin", { uploads: uploadedData });
+});
 
+// Handle upload from pin page
+app.post("/pin/upload", upload.single("image"), (req, res) => {
+  const imagePath = "/uploads/" + req.file.filename;
+  const comment = req.body.comment || "";
 
+  uploadedData.push({ imagePath, comment });
+  res.redirect("/pin/new");
+});
 
   
   app.get('/pin/new', (req, res) => {

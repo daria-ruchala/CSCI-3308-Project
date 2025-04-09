@@ -1,0 +1,21 @@
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+  <h1 class="text-xl font-semibold mb-4">Upload an Image and Add a Comment</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
+    <input type="file" name="image" required class="block">
+    <textarea name="comment" placeholder="Add a comment..." class="w-full p-2 border rounded"></textarea>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Upload</button>
+  </form>
+
+  {{#if uploads.length}}
+    <hr class="my-6">
+    <h2 class="text-lg font-medium mb-2">Uploaded Images</h2>
+    <div class="space-y-6">
+      {{#each uploads}}
+        <div class="border p-4 rounded bg-gray-50">
+          <img src="{{this.imagePath}}" alt="uploaded image" class="max-w-full h-auto mb-2">
+          <p class="text-gray-700">{{this.comment}}</p>
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+</div>
