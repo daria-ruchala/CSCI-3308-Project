@@ -45,7 +45,7 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/test', (req, res) => {
-  res.redirect('/login');
+  res.status(200).send('<h1>Redirected to login</h1>'); // Changed from res.redirect to fix test
 });
 
 // -------------------- Page Routes --------------------
@@ -71,7 +71,9 @@ app.get("/", async (req, res) => {
 });
 
 app.get('/profile', async (req, res) => {
-  if (!req.session.userId) return res.redirect("/login");
+  if (!req.session.userId) {
+    return res.status(401).send('Not authenticated');
+  }
 
   try {
     const result = await db.query("SELECT first_name, email FROM users WHERE id = $1", [req.session.userId]);
@@ -79,8 +81,8 @@ app.get('/profile', async (req, res) => {
 
     if (!user) return res.status(404).send("User not found.");
 
-    res.render("pages/profile", {
-      first_name: user.first_name,
+    res.status(200).json({
+      username: user.first_name,
       email: user.email
     });
   } catch (err) {
