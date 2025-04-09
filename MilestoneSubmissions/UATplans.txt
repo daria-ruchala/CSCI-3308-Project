@@ -1,0 +1,100 @@
+
+User Acceptance Testing (UAT) Plan
+
+Project: CSCI-3308 Group 8 Project
+Testers: Group members simulating end-users
+
+
+Feature 1: User Login
+---------------------
+Test Cases:
+1. Successful login with valid credentials
+   - Input: Registered email and correct password
+   - Expected Result: Redirect to home page
+
+2. Login failure with incorrect credentials
+   - Input: Incorrect email or password
+   - Expected Result: User stays on login page, sees error message
+
+3. Login failure with empty fields
+   - Input: Blank email/password
+   - Expected Result: Error message shown, user not logged in
+
+Test Data:
+{
+  "email": "emiliano@gmail.com",
+  "password": "emiliano123"
+}
+
+Environment:
+- localhost:3000 in Docker container
+
+Testers:
+- All team members
+
+Observed Results:
+- System behaves as expected on all inputs, redirects or displays errors appropriately.
+
+
+Feature 2: User Registration
+----------------------------
+Test Cases:
+1. Successful registration with valid fields
+   - Input: Valid name, email, password
+   - Expected Result: Account is created, user redirected to home page
+
+2. Registration failure with missing fields
+   - Input: Missing name/email/password
+   - Expected Result: Error message shown
+
+3. Registration failure with duplicate email
+   - Input: Email already exists in database
+   - Expected Result: Error message shown
+
+Test Data:
+{
+  "first_name": "Test",
+  "email": "testuser@example.com",
+  "password": "StrongPass123"
+}
+
+Environment:
+- localhost:3000 in Docker
+
+Testers:
+- All team members
+
+Observed Results:
+- All error conditions were triggered and handled as expected.
+
+
+Feature 3: User Profile Page
+----------------------------
+Test Cases:
+1. Access profile when logged in
+   - Input: Click "Profile" in nav after login
+   - Expected Result: Profile page with name/email shown
+
+2. Try to access profile without login
+   - Input: Go directly to /profile without logging in
+   - Expected Result: Redirect to login page
+
+Test Data:
+- Logged-in session with valid user ID
+
+Environment:
+- localhost:3000
+
+Testers:
+- All team members
+
+Observed Results:
+- Users see their profile or are redirected correctly.
+
+
+Risks
+-----
+Type:               Description                                                                 
+Organizational:     Some teammates may not be available to test full flows during busy weeks.   
+Technical:          New features added late may not be fully tested.                           
+Business:           If hosting is needed for demo, downtime may block acceptance testing.       
