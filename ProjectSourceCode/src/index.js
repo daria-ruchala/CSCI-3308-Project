@@ -86,13 +86,23 @@ app.get("/login", (req, res) => {
   
   app.post("/register", async (req, res) => {
     const { first_name, email, password } = req.body;
+  
     if (!first_name || !email || !password) {
-      return res.status(400).send("Missing registration fields");
+      return res.render("pages/register", {
+        error: "All fields are required.",
+      });
     }
   
-    const hashedPassword = await bcrypt.hash(password, 10);
-  
     try {
+      const existing = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+      if (existing.rows.length > 0) {
+        return res.render("pages/register", {
+          error: "An account with that email already exists.",
+        });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
       const result = await db.query(
         "INSERT INTO users (first_name, email, password) VALUES ($1, $2, $3) RETURNING id",
         [first_name, email, hashedPassword]
@@ -101,10 +111,13 @@ app.get("/login", (req, res) => {
       req.session.userId = result.rows[0].id;
       res.redirect("/");
     } catch (err) {
-        console.error("Registration error:", err); // <-- more helpful
-        res.status(500).send("Registration failed.");
-      }
+      console.error("Registration error:", err);
+      res.render("pages/register", {
+        error: "Registration failed. Please try again.",
+      });
+    }
   });
+  
   
   // Handle login
   app.post("/login", async (req, res) => {
