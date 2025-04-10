@@ -1,0 +1,26 @@
+<h2 class="text-2xl font-bold mb-4">Pin: {{pinId}}</h2>
+
+{{#if isNew}}
+  <p class="mb-4">No photos yet. Start the gallery:</p>
+{{else}}
+  <h3 class="text-xl font-semibold mb-2">Gallery</h3>
+  <div class="grid grid-cols-2 gap-4 mb-8">
+    {{#each gallery}}
+      <div>
+        <img src="{{this.imagePath}}" alt="Photo" class="rounded shadow max-w-full max-h-64 object-cover" />
+        <p class="mt-1 text-gray-700">{{this.comment}}</p>
+      </div>
+    {{/each}}
+  </div>
+{{/if}}
+
+<h3 class="text-lg font-semibold mb-2">Add a new photo</h3>
+<form action="/pin/{{pinId}}/upload" method="POST" enctype="multipart/form-data">
+  <label for="image">Image:</label>
+  <input type="file" name="image" required class="block mb-3" />
+
+  <label for="comment">Comment:</label>
+  <input type="text" name="comment" placeholder="Your comment..." class="block mb-4" />
+
+  <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Upload</button>
+</form>
