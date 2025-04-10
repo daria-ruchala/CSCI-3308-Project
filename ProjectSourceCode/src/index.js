@@ -202,6 +202,23 @@ app.get("/", async (req, res) => {
   }
 });
 
+const uploadedData = [];
+
+// Routes
+// New pin page with image form
+app.get("/pin/new", (req, res) => {
+  res.render("pages/newPin", { uploads: uploadedData });
+});
+
+// Handle upload from pin page
+// app.post("/pin/upload", upload.single("image"), (req, res) => {
+//   const imagePath = "/uploads/" + req.file.filename;
+//   const comment = req.body.comment || "";
+
+//   uploadedData.push({ imagePath, comment });
+//   res.redirect("/pin/new");
+// });
+
   app.get('/pin/new', (req, res) => {
     res.render('pages/newPin');
   });
