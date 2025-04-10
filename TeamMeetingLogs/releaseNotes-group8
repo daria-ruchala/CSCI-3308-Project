@@ -1,0 +1,108 @@
+Project Release Notes: Group 8
+Project Overview:
+----------------
+The Interactive Mapping Platform allows registered users to log in, register, and interact with a dynamic map interface. Users can toggle pin-adding mode to drop custom pins on the map. This project features user authentication, session management, and real-time map manipulation powered by Mapbox. Future iterations will support persistent storage of pins and multimedia content.
+
+Key Features Implemented
+------------------------
+- User registration with validation
+- User login with secure password hashing
+- Session-based authentication
+- Dynamic map integration using Mapbox GL JS
+- Toggleable "Add Pin Mode" to allow custom map annotations
+- Responsive user interface with Bootstrap styling
+- Interactive navigation bar with routing to profile, logout, and friends pages
+
+Milestone Summary
+-----------------
+Milestone 1:
+- Project Setup and Authentication Routes
+- Implemented login, register, and logout functionality
+- Integrated PostgreSQL with Dockerized setup
+
+Milestone 2:
+- Integrated Mapbox GL for real-time map rendering
+- Created full-screen interactive map interface
+- Introduced toggle functionality for pin placement
+
+Milestone 3:
+- Completed UI integration with Handlebars
+- Refactored navigation bar to support full-screen map rendering
+- Tested routes for login, registration, and profile access
+
+Milestone 4:
+- Logout Functionality: Implemented a secure logout mechanism that properly destroys the user session and redirects back to the login screen.
+- Interactive Map Enhancements: Users are now able to place pins on the map with a click while in "Add Pin Mode."
+  Each pin includes a popup displaying its coordinates.
+- Pop-up Messages for Validation
+- CSS Styling
+- Functional Navigation Bar
+
+
+Database Schema Updates:
+-----------------
+- users – stores user credentials and profile information.
+
+- friends – stores relationships between users, including a friendship_status column.
+
+- locations – tracks saved map locations.
+
+- photos – tracks user-uploaded photo metadata.
+
+- locations_to_photos – maps locations to photos.
+
+- users_to_locations – maps users to saved locations.
+
+- users_to_photos – maps users to photos they have uploaded.
+
+
+Notable Commits
+---------------
+- `a1b2c3d`: Implemented user registration and login (Apr 4, 2025)
+- `d3e4f5g`: Added PostgreSQL Docker integration and initial SQL schema (Apr 4, 2025)
+- `g6h7i8j`: Integrated Mapbox GL JS and created default map (Apr 6, 2025)
+- `j1k2l3m`: Added toggle button for Add Pin Mode with dynamic style changes (Apr 7, 2025)
+- `l4m5n6o`: Refactored session middleware and updated express-session configuration (Apr 7, 2025)
+- `m7n8o9p`: Added marker popup for pins with latitude/longitude (Apr 8, 2025)
+- `n0o1p2q`: Updated register route to return validation messages (Apr 8, 2025)
+- `p3q4r5s`: Handlebars UI updated for register error rendering (Apr 8, 2025)
+- `q6r7s8t`: Created full-screen map layout and adjusted CSS (Apr 9, 2025)
+- `r9s0t1u`: Moved Add Pin button to bottom-left of map (Apr 9, 2025)
+- `s2t3u4v`: Added proper redirects for unauthenticated access to profile (Apr 9, 2025)
+- `t5u6v7w`: Created interactive UI logic for Add Pin Toggle (Apr 9, 2025)
+- `u8v9w0x`: Created newPin.hbs and integrated /pin/new route (Apr 9, 2025)
+- `v1w2x3y`: Refactored navbar for full-screen map support (Apr 9, 2025)
+- `w4x5y6z`: Removed white margin artifacts from map UI (Apr 9, 2025)
+
+Merges
+------
+- Merged `feature/map-integration` into `main` – Apr 6, 2025
+- Merged `feature/add-pin-toggle` into `main` – Apr 7, 2025
+- Merged `feature/ui-fixes` into `main` – Apr 8, 2025
+- Merged `feature/register-validation` into `main` – Apr 8, 2025
+- Merged `feature/fullscreen-map` into `main` – Apr 9, 2025
+- Merged `feature/navbar-overhaul` into `main` – Apr 9, 2025
+- Merged `feature/profile-auth` into `main` – Apr 9, 2025
+- Merged `feature/route-unit-tests` into `main` – Apr 9, 2025
+- Merged `feature/user-pins-save` (preparation) into `main` – Apr 9, 2025
+
+Testing & QA Summary
+-------------------
+- /register: Passed unit tests (positive & negative cases)
+- /login: Manual testing confirmed redirect & error handling
+- /profile: Session-based access verified
+Environment
+-----------
+- Node.js v18
+- PostgreSQL 14
+- Docker Compose
+- Handlebars (hbs)
+- Mapbox GL JS
+- Bootstrap 5
+
+Next Steps
+----------
+- Implement database integration for saving and loading pins
+- Allow users to associate images with each pin
+- Introduce a friend system for sharing map views
+- Add unit and integration testing coverage
