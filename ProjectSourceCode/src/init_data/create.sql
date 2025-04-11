@@ -51,3 +51,16 @@ CREATE TABLE users_to_photos (
     photo_id INT NOT NULL
 );
 
+CREATE TABLE pins_map (
+    pin_id SERIAL PRIMARY KEY,
+    longitude DECIMAL NOT NULL,
+    latitude DECIMAL NOT NULL,
+    pin_caption TEXT
+);
+
+CREATE TABLE users_to_pins (
+    user_id INT NOT NULL,
+    pin_id INT NOT NULL
+);
+
+
