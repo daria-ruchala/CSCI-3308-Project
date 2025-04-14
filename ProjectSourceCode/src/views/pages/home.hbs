@@ -54,6 +54,7 @@
 
 <div class="bottom-left-controls">
   <button id="toggle-add-pin" class="btn btn-primary">🧷 Add Pin Mode</button>
+  <button id="toggle-style" class="btn btn-secondary">🌓 Switch Map Style</button>
 </div>
 
 <div id="map"></div>
@@ -76,6 +77,16 @@
     btn.classList.toggle("btn-primary", !addPinMode);
     btn.textContent = addPinMode ? "✅ Click Map to Add Pin" : "🧷 Add Pin Mode";
   });
+  let currentStyle = "light"; // default
+
+document.getElementById("toggle-style").addEventListener("click", () => {
+  currentStyle = currentStyle === "light" ? "dark" : "light";
+  map.setStyle(
+    currentStyle === "light"
+      ? "mapbox://styles/fotos4family/cm9bzyq2l007001sp2el69jnl" // your light style
+      : "mapbox://styles/mapbox/dark-v11" // Mapbox's dark theme
+  );
+});
 
   // Load existing pins from the database
   fetch("/api/pins")
