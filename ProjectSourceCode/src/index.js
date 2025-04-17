@@ -6,6 +6,7 @@ const { Pool } = require("pg");
 const exphbs = require("express-handlebars");
 const app = express();
 const multer = require("multer");
+require("dotenv").config();
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -57,11 +58,11 @@ app.use((req, res, next) => {
 
 // DB connection
 const db = new Pool({
-  host: process.env.DB_HOST || "db",
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "postgres",
-  database: process.env.DB_DATABASE || "jobtracker",
-  port: process.env.DB_PORT || 5432,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
 });
 
 const storage = multer.diskStorage({
