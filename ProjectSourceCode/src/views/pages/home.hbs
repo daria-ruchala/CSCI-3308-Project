@@ -93,13 +93,18 @@ document.getElementById("toggle-style").addEventListener("click", () => {
     .then(res => res.json())
     .then(data => {
       data.forEach(pin => {
-        const el = document.createElement('div');
-        el.className = 'marker';
+  const el = document.createElement('div');
+  el.className = 'marker';
 
-        new mapboxgl.Marker(el)
-          .setLngLat([pin.longitude, pin.latitude])
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(pin.label))
-          .addTo(map);
+  new mapboxgl.Marker(el)
+    .setLngLat([pin.longitude, pin.latitude])
+    .setPopup(
+      new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <h6>${pin.label}</h6>
+        <a href="/pin/${pin.id}" class="btn btn-sm btn-outline-primary mt-2">View & Upload</a>
+      `)
+    )
+    .addTo(map);
       });
     });
 

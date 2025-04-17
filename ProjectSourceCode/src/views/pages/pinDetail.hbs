@@ -1,0 +1,44 @@
+{{> nav }}
+
+<div class="container mt-4">
+  <h1 class="mb-4">📍 Pin Gallery: ID {{pinId}}</h1>
+
+  <!-- Image Upload -->
+  <h3>Upload Image</h3>
+  <form action="/pin/{{pinId}}/upload" method="POST" enctype="multipart/form-data" class="mb-4">
+    <div class="mb-3">
+      <input type="file" name="image" class="form-control" required>
+    </div>
+    <button class="btn btn-primary" type="submit">Upload</button>
+  </form>
+
+  <!-- Comment Form -->
+  <h3>Leave a Comment</h3>
+  <form action="/pin/{{pinId}}/comment" method="POST" class="mb-5">
+    <div class="mb-3">
+      <textarea name="comment" class="form-control" placeholder="Type your comment..." required></textarea>
+    </div>
+    <button class="btn btn-success" type="submit">Post Comment</button>
+  </form>
+
+  <!-- Gallery Section -->
+  <h3>📸 Uploaded Images</h3>
+  <div class="row">
+    {{#each images}}
+      <div class="col-md-3 mb-3">
+        <img src="/uploads/{{this.image_path}}" alt="Uploaded Image" class="img-fluid rounded shadow-sm" />
+      </div>
+    {{/each}}
+  </div>
+
+  <!-- Comments Section -->
+  <h3>🗨️ Comments</h3>
+  <ul class="list-group">
+    {{#each comments}}
+      <li class="list-group-item">
+        <p class="mb-1">{{this.comment}}</p>
+        <small class="text-muted">{{this.created_at}}</small>
+      </li>
+    {{/each}}
+  </ul>
+</div>

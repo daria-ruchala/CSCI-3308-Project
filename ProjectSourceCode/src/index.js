@@ -5,6 +5,12 @@ const path = require("path");
 const { Pool } = require("pg");
 const exphbs = require("express-handlebars");
 const app = express();
+const multer = require("multer");
+
+// Static files
+app.use(express.static(path.join(__dirname, "public")));
+app.use('/uploads', express.static(path.join(__dirname, "public/uploads")));
+
 // const hbs = handlebars.create({
 //   extname: 'hbs',
 //   layoutsDir: __dirname + '/views/layouts',
@@ -40,6 +46,11 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/static', express.static(path.join(__dirname, 'recources')));
 
+app.use((req, res, next) => {
+  res.locals.first_name = req.session.first_name;
+  res.locals.email = req.session.email;
+  next();
+});
 
 
 
@@ -52,6 +63,18 @@ const db = new Pool({
   database: process.env.DB_DATABASE || "jobtracker",
   port: process.env.DB_PORT || 5432,
 });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  },
+});
+const upload = multer({ storage });
+
 //Your routes (register/login/logout) go here 
 // Show login page
 app.get("/login", (req, res) => {
@@ -64,23 +87,23 @@ app.get("/login", (req, res) => {
   });
 
   // Show home page (only if logged in)
-  app.get("/", async (req, res) => {
-    if (!req.session.userId) {
-      return res.redirect("/login");
-    }
+  // app.get("/", async (req, res) => {
+  //   if (!req.session.userId) {
+  //     return res.redirect("/login");
+  //   }
   
-    try {
-      const result = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
-      const user = result.rows[0];
+  //   try {
+  //     const result = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
+  //     const user = result.rows[0];
   
-      res.render("pages/home", {
-        first_name: user.first_name
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Failed to load home page.");
-    }
-  });
+  //     res.render("pages/home", {
+  //       first_name: user.first_name
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).send("Failed to load home page.");
+  //   }
+  // });
   
   // Handle registration
   
@@ -226,6 +249,52 @@ app.get("/pin/new", (req, res) => {
   app.get('/friends/add', (req, res) => {
     res.render('pages/friends');
   });
+
+app.get("/api/pins", async (req, res) => {
+  const result = await db.query("SELECT * FROM pins");
+  res.json(result.rows);
+});
+
+app.post("/api/pins", async (req, res) => {
+  const { latitude, longitude, label } = req.body;
+  const result = await db.query(
+    "INSERT INTO pins (latitude, longitude, label) VALUES ($1, $2, $3) RETURNING id",
+    [latitude, longitude, label || "New Pin"]
+  );
+  res.json({ id: result.rows[0].id });
+});
+
+app.get("/pin/:id", async (req, res) => {
+  const pinId = req.params.id;
+  try {
+    const comments = await db.query("SELECT * FROM pin_comments WHERE pin_id = $1", [pinId]);
+    const images = await db.query("SELECT * FROM pin_images WHERE pin_id = $1", [pinId]);
+    res.render("pages/pinDetail", {
+      pinId,
+      comments: comments.rows,
+      images: images.rows,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading pin detail.");
+  }
+});
+
+app.post("/pin/:id/comment", async (req, res) => {
+  const pinId = req.params.id;
+  const { comment } = req.body;
+  await db.query("INSERT INTO pin_comments (pin_id, comment) VALUES ($1, $2)", [pinId, comment]);
+  res.redirect(`/pin/${pinId}`);
+});
+
+app.post("/pin/:id/upload", upload.single("image"), async (req, res) => {
+  const pinId = req.params.id;
+  const imagePath = req.file.filename;
+  await db.query("INSERT INTO pin_images (pin_id, image_path) VALUES ($1, $2)", [pinId, imagePath]);
+  res.redirect(`/pin/${pinId}`);
+});
+
+
   
 // Start server
 const PORT = process.env.PORT || 3000;
