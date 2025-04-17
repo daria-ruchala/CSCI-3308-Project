@@ -5,20 +5,25 @@
     <div class="col-md-6 col-lg-5">
       <div class="card shadow p-4 rounded-4" style="background-color: white; border: none;">
         <h2 class="text-center mb-4 fw-bold" style="font-size: 1.8rem;">👥 Your Friends</h2>
+        <h4 class="text-center mb-4 fw-bold" style="font-size: 1.5rem;">Welcome, {{first_name}}!</h4>
 
+        <!-- Friend List -->
         <ul id="friend-list" class="list-group mb-4">
-          <!-- Friends will be added here dynamically -->
+          <!-- Friends will be populated here -->
         </ul>
 
+        <!-- Add Friend -->
         <div class="d-grid gap-2 mb-3">
           <button onclick="showInput()" class="btn btn-outline-primary">➕ Add a Friend</button>
         </div>
 
         <div id="input-section" class="mb-4" style="display: none;">
-          <input type="text" id="friend-username" class="form-control mb-2" placeholder="Enter friend's username" />
+          <input type="text" id="friend-code" class="form-control mb-2" placeholder="Enter friend's code" />
           <button onclick="addFriend()" class="btn btn-success w-100">Submit</button>
+          <div id="feedback-message" class="mt-2 text-center small"></div>
         </div>
 
+        <!-- Navigation -->
         <div class="d-flex justify-content-center gap-2">
           <a href="/" class="btn btn-outline-secondary px-4">🏠 Home</a>
           <a href="/logout" class="btn btn-outline-danger px-4">🚪 Logout</a>
@@ -29,23 +34,72 @@
 </div>
 
 <script>
+  // Show the friend code input
   function showInput() {
     document.getElementById("input-section").style.display = "block";
+    document.getElementById("feedback-message").textContent = '';
   }
 
-  function addFriend() {
-    const username = document.getElementById("friend-username").value.trim();
-    if (username) {
-      const friendList = document.getElementById("friend-list");
-      const newFriend = document.createElement("li");
-      newFriend.className = "list-group-item";
-      newFriend.textContent = username;
-      friendList.appendChild(newFriend);
+  // Add a friend using friend code
+  async function addFriend() {
+    const friendCode = document.getElementById("friend-code").value.trim();
+    const feedback = document.getElementById("feedback-message");
 
-      document.getElementById("friend-username").value = '';
-      document.getElementById("input-section").style.display = "none";
-    } else {
-      alert("⚠️ Please enter a valid username.");
+    if (!friendCode) {
+      feedback.textContent = "⚠️ Please enter a friend code.";
+      feedback.style.color = "red";
+      return;
+    }
+
+    try {
+      const response = await fetch('/add-friend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ friendCode })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const friendList = document.getElementById("friend-list");
+        const newFriend = document.createElement("li");
+        newFriend.className = "list-group-item";
+        newFriend.textContent = data.username;
+        friendList.appendChild(newFriend);
+
+        feedback.textContent = "✅ Friend added!";
+        feedback.style.color = "green";
+        document.getElementById("friend-code").value = '';
+        setTimeout(() => {
+          document.getElementById("input-section").style.display = "none";
+          feedback.textContent = '';
+        }, 1500);
+      } else {
+        feedback.textContent = `❌ ${data.message}`;
+        feedback.style.color = "red";
+      }
+    } catch (err) {
+      console.error(err);
+      feedback.textContent = "🚫 Something went wrong. Try again.";
+      feedback.style.color = "red";
     }
   }
+
+  // Load current friend list on page load
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('/friends-list');
+      const friends = await response.json();
+
+      const friendList = document.getElementById("friend-list");
+      friends.forEach(friend => {
+        const item = document.createElement("li");
+        item.className = "list-group-item";
+        item.textContent = friend.username;
+        friendList.appendChild(item);
+      });
+    } catch (err) {
+      console.error("Could not load friends list", err);
+    }
+  });
 </script>
