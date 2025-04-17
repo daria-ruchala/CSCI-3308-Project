@@ -15,12 +15,12 @@ CREATE TABLE IF NOT EXISTS users (
 --     last_name VARCHAR(50)
 -- );
 
-DROP TABLE IF EXISTS friends;
-CREATE TABLE friends (
-    user_id_1 INT NOT NULL,
-    user_id_2 INT NOT NULL,
-    friendship_status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
-);
+-- DROP TABLE IF EXISTS friends;
+-- CREATE TABLE friends (
+--     user_id_1 INT NOT NULL,
+--     user_id_2 INT NOT NULL,
+--     friendship_status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
+-- );
 
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (
@@ -51,23 +51,25 @@ CREATE TABLE users_to_photos (
     photo_id INT NOT NULL
 );
 
-CREATE TABLE pins_map (
-    pin_id SERIAL PRIMARY KEY,
-    longitude DECIMAL NOT NULL,
-    latitude DECIMAL NOT NULL,
-    pin_caption TEXT
-);
+-- CREATE TABLE pins_map (
+--     pin_id SERIAL PRIMARY KEY,
+--     longitude DECIMAL NOT NULL,
+--     latitude DECIMAL NOT NULL,
+--     pin_caption TEXT
+-- );
 
-CREATE TABLE users_to_pins (
-    user_id INT NOT NULL,
-    pin_id INT NOT NULL
-);
+-- CREATE TABLE users_to_pins (
+--     user_id INT NOT NULL,
+--     pin_id INT NOT NULL
+-- );
 
-CREATE TABLE IF NOT EXISTS pins (
+DROP TABLE IF EXISTS pins;
+CREATE TABLE pins (
   id SERIAL PRIMARY KEY,
   latitude DOUBLE PRECISION NOT NULL,
   longitude DOUBLE PRECISION NOT NULL,
   label TEXT DEFAULT 'Pin! ',
+  user_id INTEGER REFERENCES users(id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

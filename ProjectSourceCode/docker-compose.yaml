@@ -10,7 +10,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./src/init_data:/docker-entrypoint-initdb.d
-
   web:
     image: node:18
     working_dir: /app
