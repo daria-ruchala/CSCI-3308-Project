@@ -10,3 +10,11 @@ Meeting 3 - 2: https://youtu.be/t76pzS1i0hA
 Meeting 4 - https://youtu.be/YzzROJdhi0I
 
 Meeting 5 - https://youtu.be/3ZZKRbaPIvg
+
+Meeting 6 - Duration 25 min
+• I need to fix the bugs with the friend code system but I’m hoping to fix that and push that tonight
+• Chris is working in changing and profile stuff
+• Friend maps 
+• Clicking on a table and selecting which friends Maps to show
+• Brandon working on adding a pin and taking it to the gallery page
+• Daria is working on the gallery page where you add a photo and comment
