@@ -6,7 +6,7 @@ const { Pool } = require("pg");
 const exphbs = require("express-handlebars");
 const app = express();
 const multer = require("multer");
-require("dotenv").config();
+// require("dotenv").config();
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
