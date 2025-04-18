@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   first_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  friend_code TEXT UNIQUE NOT NULL
 );
 
 -- DROP TABLE IF EXISTS users;
@@ -15,12 +16,14 @@ CREATE TABLE IF NOT EXISTS users (
 --     last_name VARCHAR(50)
 -- );
 
--- DROP TABLE IF EXISTS friends;
--- CREATE TABLE friends (
---     user_id_1 INT NOT NULL,
---     user_id_2 INT NOT NULL,
---     friendship_status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
--- );
+
+DROP TABLE IF EXISTS friends;
+CREATE TABLE friends (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  friend_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE(user_id, friend_id)
+);
 
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (

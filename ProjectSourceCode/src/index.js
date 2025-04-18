@@ -77,6 +77,16 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 //Your routes (register/login/logout) go here 
+
+function generateFriendCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    if (i === 3) code += '-';
+  }
+  return code;
+}
 // Show login page
 app.get("/login", (req, res) => {
     res.render("pages/login");
@@ -110,6 +120,8 @@ app.get("/login", (req, res) => {
   
   app.post("/register", async (req, res) => {
     const { first_name, email, password } = req.body;
+    const friend_code = generateFriendCode();
+
   
     if (!first_name || !email || !password) {
       return res.render("pages/register", {
@@ -126,10 +138,11 @@ app.get("/login", (req, res) => {
       }
   
       const hashedPassword = await bcrypt.hash(password, 10);
+
   
       const result = await db.query(
-        "INSERT INTO users (first_name, email, password) VALUES ($1, $2, $3) RETURNING id",
-        [first_name, email, hashedPassword]
+        "INSERT INTO users (first_name, email, password, friend_code) VALUES ($1, $2, $3, $4) RETURNING id",
+        [first_name, email, hashedPassword, friend_code]
       );
   
       req.session.userId = result.rows[0].id;
@@ -163,6 +176,7 @@ app.get("/login", (req, res) => {
       req.session.userId = user.id;
       req.session.email = user.email;
       req.session.first_name = user.first_name;
+      req.session.friend_code = user.friend_code;
       res.redirect("/");
     } catch (err) {
       console.error(err);
@@ -201,6 +215,84 @@ app.get("/", async (req, res) => {
     res.status(500).send("Failed to load home page.");
   }
 });
+
+
+// -------------------- Friends API --------------------
+app.get("/friends", async (req, res) => {
+  if (!req.session.userId) return res.redirect("/login");
+
+  try {
+    const result = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
+    const user = result.rows[0];
+    res.render("pages/friends", { first_name: user.first_name });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to load friends page.");
+  }
+});
+
+app.get('/friends-list', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ message: 'Unauthorized' });
+
+  try {
+    const result = await db.query(`
+      SELECT u.first_name AS username
+      FROM friends f
+      JOIN users u ON f.friend_id = u.id
+      WHERE f.user_id = $1
+    `, [req.session.userId]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching friends:", err);
+    res.status(500).json({ message: "Failed to load friends" });
+  }
+});
+
+app.post('/add-friend', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ message: 'Unauthorized' });
+
+  const { friendCode } = req.body;
+
+  try {
+    const friendResult = await db.query(
+      'SELECT id, first_name FROM users WHERE friend_code = $1',
+      [friendCode]
+    );
+
+    if (friendResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Friend code not found.' });
+    }
+
+    const friendId = friendResult.rows[0].id;
+    const friendName = friendResult.rows[0].first_name;
+    const userId = req.session.userId;
+
+    if (friendId === userId) {
+      return res.status(400).json({ message: 'You cannot add yourself.' });
+    }
+
+    const exists = await db.query(
+      'SELECT 1 FROM friends WHERE user_id = $1 AND friend_id = $2',
+      [userId, friendId]
+    );
+
+    if (exists.rows.length > 0) {
+      return res.status(400).json({ message: 'Already friends.' });
+    }
+
+    await db.query(
+      'INSERT INTO friends (user_id, friend_id) VALUES ($1, $2)',
+      [userId, friendId]
+    );
+
+    res.json({ username: friendName });
+  } catch (err) {
+    console.error("Add friend error:", err);
+    res.status(500).json({ message: "Error adding friend" });
+  }
+});
+
   
   // -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
   app.get('/profile', async (req, res) => {
@@ -209,7 +301,7 @@ app.get("/", async (req, res) => {
   }
 
   try {
-    const result = await db.query("SELECT first_name, email FROM users WHERE id = $1", [req.session.userId]);
+    const result = await db.query("SELECT first_name, email, friend_code FROM users WHERE id = $1", [req.session.userId]);
     const user = result.rows[0];
 
     if (!user) {
@@ -218,8 +310,10 @@ app.get("/", async (req, res) => {
 
     res.render("pages/profile", {
       first_name: user.first_name,
-      email: user.email
+      email: user.email,
+      friend_code: user.friend_code
     });
+
   } catch (err) {
     console.error(" Profile route error:", err);
     res.status(500).send("Failed to load profile page.");
@@ -244,9 +338,24 @@ app.get("/pin/new", (req, res) => {
 // });
 
   
-  app.get('/friends/add', (req, res) => {
-    res.render('pages/friends');
-  });
+//merge conflict was here
+//app.get("/api/pins", async (req, res) => {
+//  const result = await db.query("SELECT * FROM pins");
+//  res.json(result.rows);
+//});
+
+//app.post("/api/pins", async (req, res) => {
+ // const { latitude, longitude, label } = req.body;
+ // const result = await db.query(
+   // "INSERT INTO pins (latitude, longitude, label) VALUES ($1, $2, $3) RETURNING id",
+    //[latitude, longitude, label || "New Pin"]
+ // );
+  //res.json({ id: result.rows[0].id });
+//});
+//merged here
+ // app.get('/friends/add', (req, res) => {
+//    res.render('pages/friends');
+ // });
 
   app.get("/api/pins", async (req, res) => {
     const userId = req.session.userId;
@@ -283,6 +392,7 @@ app.get("/pin/new", (req, res) => {
       res.status(500).json({ error: "Failed to save pin." });
     }
   });
+//merge conflict was here
 
 app.get("/pin/:id", async (req, res) => {
   const pinId = req.params.id;
