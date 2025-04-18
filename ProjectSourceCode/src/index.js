@@ -6,6 +6,7 @@ const { Pool } = require("pg");
 const exphbs = require("express-handlebars");
 const app = express();
 const multer = require("multer");
+// require("dotenv").config();
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -57,11 +58,11 @@ app.use((req, res, next) => {
 
 // DB connection
 const db = new Pool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "postgres",
-  database: process.env.DB_DATABASE || "jobtracker",
-  port: process.env.DB_PORT || 5432,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
 });
 
 const storage = multer.diskStorage({
@@ -336,23 +337,62 @@ app.get("/pin/new", (req, res) => {
 //   res.redirect("/pin/new");
 // });
 
-  app.get('/pin/new', (req, res) => {
-    res.render('pages/newPin');
+  
+//merge conflict was here
+//app.get("/api/pins", async (req, res) => {
+//  const result = await db.query("SELECT * FROM pins");
+//  res.json(result.rows);
+//});
+
+//app.post("/api/pins", async (req, res) => {
+ // const { latitude, longitude, label } = req.body;
+ // const result = await db.query(
+   // "INSERT INTO pins (latitude, longitude, label) VALUES ($1, $2, $3) RETURNING id",
+    //[latitude, longitude, label || "New Pin"]
+ // );
+  //res.json({ id: result.rows[0].id });
+//});
+//merged here
+ // app.get('/friends/add', (req, res) => {
+//    res.render('pages/friends');
+ // });
+
+  app.get("/api/pins", async (req, res) => {
+    const userId = req.session.userId;
+  
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+  
+    try {
+      const result = await db.query("SELECT * FROM pins WHERE user_id = $1", [userId]);
+      res.json(result.rows);
+    } catch (err) {
+      console.error("Error loading pins:", err);
+      res.status(500).json({ error: "Failed to load pins." });
+    }
   });
   
-app.get("/api/pins", async (req, res) => {
-  const result = await db.query("SELECT * FROM pins");
-  res.json(result.rows);
-});
-
-app.post("/api/pins", async (req, res) => {
-  const { latitude, longitude, label } = req.body;
-  const result = await db.query(
-    "INSERT INTO pins (latitude, longitude, label) VALUES ($1, $2, $3) RETURNING id",
-    [latitude, longitude, label || "New Pin"]
-  );
-  res.json({ id: result.rows[0].id });
-});
+  app.post("/api/pins", async (req, res) => {
+    const { latitude, longitude, label } = req.body;
+    const userId = req.session.userId;
+  
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+  
+    try {
+      const result = await db.query(
+        "INSERT INTO pins (latitude, longitude, label, user_id) VALUES ($1, $2, $3, $4) RETURNING id",
+        [latitude, longitude, label || "New Pin", userId]
+      );
+      res.json({ id: result.rows[0].id });
+    } catch (err) {
+      console.error("Error saving pin:", err);
+      res.status(500).json({ error: "Failed to save pin." });
+    }
+  });
+//merge conflict was here
 
 app.get("/pin/:id", async (req, res) => {
   const pinId = req.params.id;
