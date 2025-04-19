@@ -7,6 +7,9 @@
         <h2 class="text-center mb-4 fw-bold" style="font-size: 1.8rem;">👥 Your Friends</h2>
         <h4 class="text-center mb-4 fw-bold" style="font-size: 1.5rem;">Welcome, {{first_name}}!</h4>
 
+        <!-- Friend Count -->
+        <h5 id="friend-count" class="text-center fw-semibold mb-2">Friends Added (0)</h5>
+
         <!-- Friend List -->
         <ul id="friend-list" class="list-group mb-4">
           <!-- Friends will be populated here -->
@@ -67,6 +70,9 @@
         newFriend.textContent = data.username;
         friendList.appendChild(newFriend);
 
+        const friendCount = document.getElementById("friend-count");
+        friendCount.textContent = `Friends Added (${friendList.children.length})`;
+
         feedback.textContent = "✅ Friend added!";
         feedback.style.color = "green";
         document.getElementById("friend-code").value = '';
@@ -92,12 +98,17 @@
       const friends = await response.json();
 
       const friendList = document.getElementById("friend-list");
+      const friendCount = document.getElementById("friend-count");
+      friendList.innerHTML = '';
+
       friends.forEach(friend => {
         const item = document.createElement("li");
         item.className = "list-group-item";
         item.textContent = friend.username;
         friendList.appendChild(item);
       });
+
+      friendCount.textContent = `Friends Added (${friends.length})`;
     } catch (err) {
       console.error("Could not load friends list", err);
     }

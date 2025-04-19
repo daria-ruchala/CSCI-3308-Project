@@ -5,19 +5,23 @@
 <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
 
 <style>
-  body, html {
+  
+  html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow: hidden; /* prevents scrollbars from showing up */
   }
 
   #map {
     position: absolute;
     top: 0;
+    left: 0;
     bottom: 0;
+    right: 0;
     width: 100%;
+    height: 100%;
     z-index: 0;
-    right : 0.1px;
   }
 
   .marker {
@@ -50,7 +54,24 @@
     left: 20px;
     z-index: 5;
   }
+
+  .top-left-controls {
+  position: absolute;
+  top: 80px; /* increased from 20px to 80px */
+  left: 20px;
+  z-index: 5;
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+}
 </style>
+
+<div class="top-left-controls">
+  <select id="friendFilter" class="form-select">
+    <option value="me">Only My Pins</option>
+    <option value="all">All Friends</option>
+  </select>
+</div>
 
 <div class="bottom-left-controls">
   <button id="toggle-add-pin" class="btn btn-primary">🧷 Add Pin Mode</button>
@@ -60,6 +81,9 @@
 <div id="map"></div>
 
 <script>
+  const userId = {{userId}};
+  let allPins = [];
+
   mapboxgl.accessToken = 'pk.eyJ1IjoiZm90b3M0ZmFtaWx5IiwiYSI6ImNtOGh6eWx1cDA1eXMybHB1Z2kyajJqbG0ifQ.9paU93BLc6W7vG-8KuOxng';
 
   const map = new mapboxgl.Map({
@@ -77,63 +101,91 @@
     btn.classList.toggle("btn-primary", !addPinMode);
     btn.textContent = addPinMode ? "✅ Click Map to Add Pin" : "🧷 Add Pin Mode";
   });
-  let currentStyle = "light"; // default
 
-document.getElementById("toggle-style").addEventListener("click", () => {
-  currentStyle = currentStyle === "light" ? "dark" : "light";
-  map.setStyle(
-    currentStyle === "light"
-      ? "mapbox://styles/fotos4family/cm9bzyq2l007001sp2el69jnl" // your light style
-      : "mapbox://styles/mapbox/dark-v11" // Mapbox's dark theme
-  );
-});
+  let currentStyle = "light";
+  document.getElementById("toggle-style").addEventListener("click", () => {
+    currentStyle = currentStyle === "light" ? "dark" : "light";
+    map.setStyle(currentStyle === "light"
+      ? "mapbox://styles/fotos4family/cm9bzyq2l007001sp2el69jnl"
+      : "mapbox://styles/mapbox/dark-v11");
+  });
 
-  // Load existing pins from the database
-  fetch("/api/pins")
-    .then(res => res.json())
-    .then(data => {
-      data.forEach(pin => {
-  const el = document.createElement('div');
-  el.className = 'marker';
+  async function fetchAndRenderPins() {
+    try {
+      const response = await fetch('/api/all-pins');
+      allPins = await response.json();
+      renderPins();
+    } catch (err) {
+      console.error("Error fetching pins:", err);
+    }
+  }
 
-  new mapboxgl.Marker(el)
-    .setLngLat([pin.longitude, pin.latitude])
-    .setPopup(
-      new mapboxgl.Popup({ offset: 25 }).setHTML(`
+  function renderPins() {
+  // Clear existing markers
+  document.querySelectorAll('.mapboxgl-marker').forEach(el => el.remove());
+
+  const selected = document.getElementById("friendFilter").value;
+
+  allPins.forEach(pin => {
+    // Only my pins
+    if (selected === "me" && pin.user_id !== userId) return;
+
+    // Specific friend selected — show only their pins
+    if (selected !== "me" && selected !== "all" && pin.first_name !== selected) return;
+
+    // Add marker
+    const el = document.createElement("div");
+    el.className = 'marker';
+
+    new mapboxgl.Marker(el)
+      .setLngLat([pin.longitude, pin.latitude])
+      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
         <h6>${pin.label}</h6>
-        <a href="/pin/${pin.id}" class="btn btn-sm btn-outline-primary mt-2">View & Upload</a>
-      `)
-    )
-    .addTo(map);
-      });
-    });
+        <small>By ${pin.first_name}</small>
+        <br><a href="/pin/${pin.id}" class="btn btn-sm btn-outline-primary mt-2">View & Upload</a>
+      `))
+      .addTo(map);
+  });
+}
 
-  map.on('click', function (e) {
+  document.getElementById("friendFilter").addEventListener("change", renderPins);
+
+  map.on('click', async function (e) {
     if (!addPinMode) return;
 
     const coords = e.lngLat;
-    const el = document.createElement('div');
-    el.className = 'marker';
-
-    const popup = new mapboxgl.Popup({ offset: 25 })
-      .setHTML(`<h6>New Pin</h6><p>Lat: ${coords.lat.toFixed(4)}, Lng: ${coords.lng.toFixed(4)}</p>`);
+    const el = document.createElement("div");
+    el.className = "marker";
 
     new mapboxgl.Marker(el)
       .setLngLat([coords.lng, coords.lat])
-      .setPopup(popup)
+      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h6>New Pin</h6><p>Lat: ${coords.lat.toFixed(4)}, Lng: ${coords.lng.toFixed(4)}</p>`))
       .addTo(map);
 
-    // Save to database
-    fetch("/api/pins", {
+    await fetch("/api/pins", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         latitude: coords.lat,
         longitude: coords.lng,
         label: "New Pin"
       }),
     });
+
+    fetchAndRenderPins();
   });
+
+  fetchAndRenderPins();
+
+  fetch("/friends-list")
+    .then(res => res.json())
+    .then(friends => {
+      const select = document.getElementById("friendFilter");
+      friends.forEach(friend => {
+        const opt = document.createElement("option");
+        opt.value = friend.username; // Assumes username is unique (e.g., first_name or id)
+        opt.textContent = friend.username;
+        select.appendChild(opt);
+      });
+    });
 </script>

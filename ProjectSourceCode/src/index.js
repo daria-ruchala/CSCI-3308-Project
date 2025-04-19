@@ -90,6 +90,7 @@ function generateFriendCode() {
 // Show login page
 app.get("/login", (req, res) => {
     res.render("pages/login");
+    userId: req.session.userId
   });
   
   // Show register page
@@ -204,11 +205,20 @@ app.get("/", async (req, res) => {
   }
 
   try {
-    const result = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
-    const user = result.rows[0];
+    const userResult = await db.query("SELECT first_name FROM users WHERE id = $1", [req.session.userId]);
+    const user = userResult.rows[0];
+
+    const friendsResult = await db.query(`
+      SELECT u.id, u.first_name
+      FROM friends f
+      JOIN users u ON f.friend_id = u.id
+      WHERE f.user_id = $1
+    `, [req.session.userId]);
 
     res.render("pages/home", {
-      first_name: user.first_name
+      first_name: user.first_name,
+      userId: req.session.userId,
+      friends: friendsResult.rows
     });
   } catch (err) {
     console.error(err);
@@ -392,6 +402,29 @@ app.get("/pin/new", (req, res) => {
       res.status(500).json({ error: "Failed to save pin." });
     }
   });
+
+  app.get("/api/all-pins", async (req, res) => {
+    const userId = req.session.userId;
+  
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+  
+    try {
+      const result = await db.query(`
+        SELECT p.*, u.first_name 
+        FROM pins p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.user_id = $1
+        OR p.user_id IN (
+          SELECT friend_id FROM friends WHERE user_id = $1
+        )
+      `, [userId]);
+  
+      res.json(result.rows);
+    } catch (err) {
+      console.error("Failed to load all pins:", err);
+      res.status(500).json({ error: "Error fetching pins" });
+    }
+  });
 //merge conflict was here
 
 app.get("/pin/:id", async (req, res) => {
@@ -423,13 +456,9 @@ app.post("/pin/:id/upload", upload.single("image"), async (req, res) => {
   await db.query("INSERT INTO pin_images (pin_id, image_path) VALUES ($1, $2)", [pinId, imagePath]);
   res.redirect(`/pin/${pinId}`);
 });
-
-
   
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
