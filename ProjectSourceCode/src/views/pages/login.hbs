@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>Fotos4Family – Login</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
-  <div class="auth-container">
+
+  <!-- App Header (Top-Left) -->
+  <div style="position: absolute; top: 30px; left: 30px;">
+    <h1 class="fw-bold text-white mb-1" style="font-size: 2rem;">Fotos4Family</h1>
+    <p class="text-light mb-0" style="font-size: 1.1rem;">A place where memories are shared</p>
+  </div>
+
+  <!-- Login Box -->
+  <div class="auth-container text-center">
     <h2 class="text-center">Login</h2>
 
     {{#if error}}
@@ -17,7 +25,7 @@
       </div>
     {{/if}}
 
-    <form action="/login" method="POST">
+    <form action="/login" method="POST" class="text-start">
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
         <input type="email" name="email" id="email" class="form-control" required />
