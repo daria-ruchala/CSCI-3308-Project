@@ -202,6 +202,108 @@ app.get("/", async (req, res) => {
   }
 });
 
+  // -------------------------------------  ROUTES for editProfile.hbs   ----------------------------------------------
+
+app.get('/editProfile', async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect("/login");
+}
+try {
+  const result = await db.query("SELECT first_name, email, password FROM users WHERE id = $1", [req.session.userId]);
+  const user = result.rows[0];
+
+  if (!user) {
+    return res.status(404).send("User not found.");
+  }
+
+  res.render("pages/editProfile", {
+    first_name: user.first_name,
+    email: user.email,
+    password: user.password
+  });
+} catch (err) {
+  console.error(" Profile route error:", err);
+  res.status(500).send("Failed to load profile page.");
+}
+})
+
+app.post("/editProfile", async (req, res) => {
+  try {
+    console.log("Received form data:", req.body); // Log incoming data
+
+    const { firstName, password, email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required!" });
+    }
+
+    let query = "UPDATE users SET";
+    let values = [];
+    let index = 1;
+
+    if (firstName) {
+      query += ` first_name = $${index},`;
+      values.push(firstName);
+      index++;
+    }
+    if (password) {
+      // **Hash new password before storing it**
+      const hashedPassword = await bcrypt.hash(password, 10);
+      query += ` password = $${index},`;
+      values.push(hashedPassword);
+      index++;
+    }
+
+    query = query.replace(/,$/, " WHERE email = $" + index);
+    values.push(email);
+
+    console.log("Executing query:", query, values); // Log SQL query before running
+
+    await db.query(query, values);
+
+    res.redirect("/profile"); // Redirect after successful update
+  } catch (error) {
+    console.error("Detailed error log:", error); // Log full error details
+    res.status(500).json({ message: "Failed to update profile.", error: error.message });
+  }
+});
+
+app.post("/deleteAccount", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!password || !email) {
+      return res.status(400).json({ message: "Missing password or email." });
+    }
+
+    // Retrieve stored hashed password
+    const result = await db.query("SELECT password FROM users WHERE email = $1", [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const storedHashedPassword = result.rows[0].password;
+    const isMatch = await bcrypt.compare(password, storedHashedPassword);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect password." });
+    }
+
+    // Password is correct → Delete account
+    await db.query("DELETE FROM users WHERE email = $1", [email]);
+
+    // Destroy session and redirect user to registration page
+    req.session.destroy(() => {
+      res.redirect("/login");
+    });
+
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
 const uploadedData = [];
 
 // Routes
@@ -232,5 +334,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
