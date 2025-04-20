@@ -10,7 +10,7 @@ const app = express();
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/static', express.static(path.join(__dirname, 'recources')));
 
 // View engine setup
@@ -58,9 +58,31 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + "-" + file.originalname;
     cb(null, uniqueName);
-  },
+  }
 });
-const upload = multer({ storage });
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only images are allowed"), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
+
+//to match comments with images
+const hbs = exphbs.create({
+  extname: "hbs",
+  defaultLayout: "main",
+  layoutsDir: path.join(__dirname, "views/layouts"),
+  partialsDir: path.join(__dirname, "views/partials"),
+  helpers: {
+    eq: (a, b) => a === b
+  }
+});
+app.engine("hbs", hbs.engine);
 
 // Utility
 function generateFriendCode() {
@@ -302,18 +324,21 @@ app.get("/pin/:id", async (req, res) => {
   }
 });
 
-app.post("/pin/:id/comment", async (req, res) => {
-  const pinId = req.params.id;
-  const { comment } = req.body;
-  await db.query("INSERT INTO pin_comments (pin_id, comment) VALUES ($1, $2)", [pinId, comment]);
-  res.redirect(`/pin/${pinId}`);
-});
-
 app.post("/pin/:id/upload", upload.single("image"), async (req, res) => {
   const pinId = req.params.id;
   const imagePath = req.file.filename;
-  await db.query("INSERT INTO pin_images (pin_id, image_path) VALUES ($1, $2)", [pinId, imagePath]);
-  res.redirect(`/pin/${pinId}`);
+  const caption = req.body.caption;
+
+  try {
+    await db.query("INSERT INTO pin_images (pin_id, image_path) VALUES ($1, $2)", [pinId, imagePath]);
+    if (caption) {
+      await db.query("INSERT INTO pin_comments (pin_id, comment, image_path) VALUES ($1, $2, $3)", [pinId, caption, imagePath]);
+    }
+    res.redirect(`/pin/${pinId}`);
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).send("Failed to upload image and comment.");
+  }
 });
 
 // Start server
