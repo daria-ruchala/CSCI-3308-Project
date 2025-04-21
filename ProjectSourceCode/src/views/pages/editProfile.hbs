@@ -1,68 +1,78 @@
+{{> nav }}
+
 <div class="container d-flex justify-content-center align-items-start" style="min-height: 100vh; background-color: #f4f4f4; padding-top: 60px;">
   <div class="row w-100 justify-content-center">
     <div class="col-md-6 col-lg-5">
       <div class="card shadow p-4 rounded-4" style="background-color: white; border: none;">
-        <h2>Edit Profile</h2>
+        <h2 class="text-center mb-4 fw-bold" style="font-size: 1.8rem;">Edit Profile</h2>
 
         <!-- Form with action to send data to /editProfile -->
         <form action="/editProfile" method="POST" onsubmit="validateForm(event)">
-          <input type="hidden" name="email" value="{{email}}"> <!-- Hidden field for email -->
+          <input type="hidden" name="email" value="{{email}}">
 
-          <label for="change_firstName">Change Name:</label>
-          <input type="text" id="change_firstName" name="firstName"><br><br>
+          <div class="mb-3">
+            <label for="change_firstName" class="form-label fw-semibold">Change Name</label>
+            <input type="text" id="change_firstName" name="firstName" class="form-control" placeholder="Enter new name">
+          </div>
 
-          <p>Current Name: {{first_name}}</p>
+          <p class="mb-3"><strong>Current Name:</strong> {{first_name}}</p>
 
-          <label for="change_password">Change Password:</label>
-          <input type="password" id="change_password" name="password"><br><br>
+          <div class="mb-3">
+            <label for="change_password" class="form-label fw-semibold">New Password</label>
+            <input type="password" id="change_password" name="password" class="form-control" placeholder="New password">
+          </div>
 
-          <label for="change_confirm_password">Confirm New Password:</label>
-          <input type="password" id="change_confirm_password"><br><br>
+          <div class="mb-4">
+            <label for="change_confirm_password" class="form-label fw-semibold">Confirm New Password</label>
+            <input type="password" id="change_confirm_password" class="form-control" placeholder="Confirm new password">
+          </div>
 
-          <div class="d-flex gap-2 mt-3">
+          <div class="d-flex justify-content-between">
             <a href="/profile" class="btn btn-outline-primary px-4 w-50">Back</a>
             <button type="submit" class="btn btn-primary w-50">Save</button>
           </div>
         </form>
-        <div class="text-center mt-3">
+
+        <!-- Delete Account -->
+        <div class="text-center mt-4">
           <form id="deleteForm" action="/deleteAccount" method="POST">
             <input type="hidden" name="email" value="{{email}}">
-            <input type="hidden" id="passwordInput" name="password"> <!-- Hidden field to store password -->
-            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Account</button>
+            <input type="hidden" id="passwordInput" name="password">
+            <button type="button" class="btn btn-danger w-100" onclick="confirmDelete()">Delete Account</button>
           </form>
         </div>
+
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  
-
   function validateForm(event) {
-    let name = document.getElementById("change_firstName").value.trim();
-    let password = document.getElementById("change_password").value.trim();
-    let confirm_password = document.getElementById("change_confirm_password").value.trim();
-    
-    if(password != confirm_password) {
-      alert("password does not match.");
+    const name = document.getElementById("change_firstName").value.trim();
+    const password = document.getElementById("change_password").value.trim();
+    const confirmPassword = document.getElementById("change_confirm_password").value.trim();
+
+    if (password !== confirmPassword) {
+      alert("⚠️ Passwords do not match.");
       event.preventDefault();
     }
+
     if (!name && !password) {
-      alert("Please enter some data before saving.");
-      event.preventDefault(); // Prevents form submission if no data entered
+      alert("⚠️ Please enter a name or password to save changes.");
+      event.preventDefault();
     }
   }
 
   function confirmDelete() {
-    let password = prompt("Please enter your password to confirm account deletion:");
+    const password = prompt("Please enter your password to confirm account deletion:");
 
     if (!password) {
-      alert("Account deletion canceled.");
+      alert("❌ Account deletion canceled.");
       return;
     }
 
-    document.getElementById("passwordInput").value = password; // Store password in hidden input
-    document.getElementById("deleteForm").submit(); // Submit the form
+    document.getElementById("passwordInput").value = password;
+    document.getElementById("deleteForm").submit();
   }
 </script>
