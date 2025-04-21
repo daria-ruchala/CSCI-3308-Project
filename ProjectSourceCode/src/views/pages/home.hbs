@@ -162,15 +162,19 @@
       .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h6>New Pin</h6><p>Lat: ${coords.lat.toFixed(4)}, Lng: ${coords.lng.toFixed(4)}</p>`))
       .addTo(map);
 
-    await fetch("/api/pins", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        latitude: coords.lat,
-        longitude: coords.lng,
-        label: "New Pin"
-      }),
-    });
+    const pinLabel = prompt("Give this pin a name:");
+
+  if (!pinLabel) return;
+
+  await fetch("/api/pins", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      latitude: coords.lat,
+      longitude: coords.lng,
+      label: pinLabel
+    }),
+  });
 
     fetchAndRenderPins();
   });

@@ -84,6 +84,7 @@ const hbs = exphbs.create({
 });
 app.engine("hbs", hbs.engine);
 
+
 // Utility
 function generateFriendCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -311,10 +312,15 @@ app.get("/api/all-pins", async (req, res) => {
 app.get("/pin/:id", async (req, res) => {
   const pinId = req.params.id;
   try {
+    const pinResult = await db.query("SELECT * FROM pins WHERE id = $1", [pinId]);
+    const pin = pinResult.rows[0];
+
     const comments = await db.query("SELECT * FROM pin_comments WHERE pin_id = $1", [pinId]);
     const images = await db.query("SELECT * FROM pin_images WHERE pin_id = $1", [pinId]);
+
     res.render("pages/pinDetail", {
       pinId,
+      pin, 
       comments: comments.rows,
       images: images.rows,
     });
@@ -341,6 +347,30 @@ app.post("/pin/:id/upload", upload.single("image"), async (req, res) => {
   }
 });
 
+app.post("/pin/:id/delete", async (req, res) => {
+  const pinId = req.params.id;
+  const userId = req.session.userId;
+
+  if (!userId) return res.status(401).send("Unauthorized");
+
+  try {
+    // Make sure the pin belongs to the user
+    const result = await db.query("SELECT * FROM pins WHERE id = $1 AND user_id = $2", [pinId, userId]);
+    if (result.rows.length === 0) {
+      return res.status(403).send("You do not have permission to delete this pin.");
+    }
+
+    // Delete related data (order matters due to FK constraints)
+    await db.query("DELETE FROM pin_comments WHERE pin_id = $1", [pinId]);
+    await db.query("DELETE FROM pin_images WHERE pin_id = $1", [pinId]);
+    await db.query("DELETE FROM pins WHERE id = $1", [pinId]);
+
+    res.redirect("/");
+  } catch (err) {
+    console.error("Delete pin error:", err);
+    res.status(500).send("Failed to delete pin.");
+  }
+});
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
