@@ -71,8 +71,8 @@ CREATE TABLE pins (
   id SERIAL PRIMARY KEY,
   latitude DOUBLE PRECISION NOT NULL,
   longitude DOUBLE PRECISION NOT NULL,
-  label TEXT DEFAULT 'Pin! ',
-  user_id INTEGER REFERENCES users(id),
+  label TEXT DEFAULT 'Pin!',
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, -- Ensures deletion of pins when user is removed
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
