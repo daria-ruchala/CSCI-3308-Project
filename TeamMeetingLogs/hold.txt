@@ -18,3 +18,45 @@ Meeting 6 - Duration 25 min
 • Clicking on a table and selecting which friends Maps to show
 • Brandon working on adding a pin and taking it to the gallery page
 • Daria is working on the gallery page where you add a photo and comment
+
+Meeting 7 – Duration: 30 min
+Main Topics Discussed:
+
+Discussed implementation strategy for allowing users to upload images and leave comments on pin detail pages
+
+Verified that the image upload and comment submission features are working correctly
+
+Talked about the current map setup and how users can toggle between their own pins and specific friends’ pins
+
+Explored ways to potentially remove pins, though this feature was considered optional and not a priority
+
+All members confirmed the current map filtering system and pin functionality is now stable
+
+Tasks Moving Forward:
+
+Test image rendering across different browsers/devices
+
+Final polish on pin interaction popups and detail pages
+
+Decide whether to implement pin removal in the final version
+
+
+Meeting 8 – Duration: 20 min
+Main Topics Discussed:
+
+Final review of the presentation slide deck and speaker roles
+
+Identified and discussed missing features or UI tweaks needed before submission
+
+Delegated last-minute updates (e.g. editing text, design consistency, presentation flow)
+
+Discussed approach for Q&A prep and how each member would respond to potential questions
+
+Tasks Moving Forward:
+
+Final testing on deployed app
+
+Polish UI on edit profile and image/comment sections
+
+Complete and submit final deliverables (presentation file, code, etc.)
+
