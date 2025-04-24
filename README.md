@@ -32,6 +32,7 @@ There is no extra software htat needs to be installed for this application to wo
 
 ## How to run tests:
 docker compose exec web npx mocha test/server.spec.js
+
 Feature 1: User Login
 Test Cases:
 1. Successful login with valid credentials
