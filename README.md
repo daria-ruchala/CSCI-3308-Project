@@ -1,9 +1,9 @@
 # CSCI-3308-Project
 
 ## Application Description:
-Fotos4Family is an interactive travel map designed for users to visually document and share their experiences with family and friends. Instead of just listing past trips, users can pin locations on a dynamic map, attaching images, notes, and personal stories to each spot. When a user clicks on a pinned location, they can view photos and details of the experience, creating a visual travel diary that is both engaging and easy to navigate. This allows travelers to relive their memories while providing their close circle with authentic recommendations and insights about places they’ve visited. This will also allow users to share photos from the same event instead of making something like a drive.
+Fotos4Family is an interactive travel map designed for users to document and share their experiences with family and friends visually. Instead of just listing past trips, users can pin locations on a dynamic map, attaching images, notes, and personal stories to each spot. When a user clicks on a pinned location, they can view photos and details of the experience, creating a visual travel diary that is both engaging and easy to navigate. This allows travelers to relive their memories while providing their close circle with authentic recommendations and insights about places they’ve visited. This will also allow users to share photos from the same event instead of making something like a drive.
 
-Unlike public social media platforms, Fotos4Family is designed for private sharing, ensuring that users can securely share their travel experiences only with family and friends. Whether it’s a breathtaking hike, a favorite café, or a hidden gem discovered on vacation, users can build a personalized travel history that remains interactive, visual, and meaningful. The app enhances social connectivity by allowing users to explore each other’s journeys, fostering conversations around shared experiences and future travel plans. With an intuitive design and real-time updates, Fotos4Family makes travel memories more than just photos, they become interactive experiences.
+Unlike public social media platforms, Fotos4Family is designed for private sharing, ensuring users can securely share their travel experiences only with family and friends. Whether it’s a breathtaking hike, a favorite café, or a hidden gem discovered on vacation, users can build a personalized travel history that remains interactive, visual, and meaningful. The app enhances social connectivity by allowing users to explore each other’s journeys, fostering conversations around shared experiences and future travel plans. With an intuitive design and real-time updates, Fotos4Family makes travel memories more than just photos, they become interactive experiences.
 
 
 ## Contributors:
@@ -31,7 +31,7 @@ There is no extra software htat needs to be installed for this application to wo
 
 
 ## How to run tests:
-docker compose exec web npx mocha test/server.spec.js
+RUN TESTS: docker compose exec web npx mocha test/server.spec.js
 
 Feature 1: User Login
 Test Cases:
